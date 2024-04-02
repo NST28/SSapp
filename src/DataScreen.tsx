@@ -8,7 +8,7 @@ import { DataContext } from './Context';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 const LiveChart = ({ data1, data2, width, height }) => {
-  const margin = {top: 0, right: 0, bottom: 30, left: 0 };
+  const margin = {top: 0, right: 0, bottom: 0, left: 0 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
   
@@ -18,8 +18,18 @@ const LiveChart = ({ data1, data2, width, height }) => {
   // const yAxis = d3.axisLeft(yScale);
   // const line = d3.line().x((d, i) => xScale(i)).y(yScale);
 
-  const xScale = d3.scaleLinear().domain([0, Math.max(data1.length, data2.length) - 1]).range([0, innerWidth]);
-  const yScale = d3.scaleLinear().domain([0, innerHeight]).range([innerHeight, 0]);
+  const xScale = d3.scaleLinear()
+    .domain([0, Math.max(data1.length, data2.length) - 1])
+    .range([0, innerWidth]);
+
+  const yScale = d3.scaleLinear()
+    .domain([-50, Math.max(d3.max(data1), d3.max(data2))])
+    .nice() // Ensures that ticks fully cover the Y-axis
+    .range([innerHeight, 0]);
+
+  const yScaleLabel = d3.scaleLinear()
+    .domain([0, 500]);
+
   const line1 = d3.line().x((d, i) => xScale(i)).y(d => yScale(d));
   const line2 = d3.line().x((d, i) => xScale(i)).y(d => yScale(d));
 
@@ -27,45 +37,13 @@ const LiveChart = ({ data1, data2, width, height }) => {
     <View style={styles.chart}>
       <Svg width={width} height={height}>
         <G>
-          <Line x1={0} y1={innerHeight} x2={innerWidth} y2={innerHeight} stroke="black" />
-          <Line x1={0} y1={0} x2={0} y2={innerHeight} stroke="black" />
-          {yScale.ticks().map((tick, i) => (
-            <Text style={{color: 'black'}} key={`y-label-${i}`}  x={10} y={yScale(tick)+ 50} fontSize="12" textAnchor="end" alignmentBaseline="middle">{tick}</Text>
-          ))}
+          {/* X-axis */}
+          <Line x1={0} y1={innerHeight} x2={innerWidth} y2={innerHeight} stroke="black" strokeWidth={2}/> 
+          {/* Y-axis */}
+          <Line x1={0} y1={0} x2={0} y2={innerHeight} stroke="black" strokeWidth={3}/>
+
           <Path d={line1(data1)} fill="none" stroke="green" strokeWidth={2} />
           <Path d={line2(data2)} fill="none" stroke="blue" strokeWidth={2} />
-        </G>
-      </Svg>
-    </View>
-  );
-};
-
-const LiveChart_test = ({ data1, data2 }) => {
-  var width = 350;
-  var height = 300;
-  const margin = { top: 0, right: 0, bottom: 0, left: 30 };
-  const innerWidth = width - margin.left - margin.right;
-  const innerHeight = height - margin.top - margin.bottom;
-  
-  const xScale = d3.scaleLinear().domain([0, data.length - 1]).range([0, innerWidth]);
-  const yScale = d3.scaleLinear().domain([0, innerHeight]).range([innerHeight, 0]);
-  const xAxis = d3.axisBottom(xScale).ticks(data.length);
-  const yAxis = d3.axisLeft(yScale);
-  const line = d3.line().x((d, i) => xScale(i)).y(yScale);
-
-  return (
-    <View style={styles.container}>
-      <Svg width={width} height={height}>
-        <G transform={`translate(${margin.left},${margin.top})`}>
-          <Line x1={0} y1={innerHeight} x2={innerWidth} y2={innerHeight} stroke="black" />
-          <Line x1={0} y1={0} x2={0} y2={innerHeight +20} stroke="black" />
-          {/* {data.map((_, i) => (
-            <Text key={`x-label-${i}`} x={xScale(i)} y={innerHeight + 20} fontSize="12" textAnchor="middle">{i}</Text>
-          ))} */}
-          {yScale.ticks().map((tick, i) => (
-            <Text style={{color: 'black'}} key={`y-label-${i}`} x={-10} y={yScale(tick)} fontSize="12" textAnchor="end" alignmentBaseline="middle">{tick}</Text>
-          ))}
-          <Path d={line(data)} fill="none" stroke="green" strokeWidth={2} />
         </G>
       </Svg>
     </View>
@@ -89,24 +67,23 @@ const DataScreen = () => {
   var liveDataObj = liveData.liveData;
 
   // Set newData for BLE
-  var newData1 = 25;
+  var newData1 = 0;
 
   // Set newData test
-  var newData2 = 50;
+  var newData2 = 25;
 
   useEffect(() => {
     const interval = setInterval(() => {
       // Data from BLE
       setHeartRateData1(prevData => {        
-        newData1 = liveDataObj[Object.keys(liveDataObj)[Object.keys(liveDataObj).length - 1]] * 0.4 + 25;
+        newData1 = liveDataObj[Object.keys(liveDataObj)[Object.keys(liveDataObj).length - 1]] * 0.4;
         // newData = Math.random() * 100;
         const chartData1 = [...prevData, newData1];
         return chartData1.slice(-200)
       });
 
       // Test data
-      setHeartRateData2(prevData => {        
-        // newData = liveDataObj[Object.keys(liveDataObj)[Object.keys(liveDataObj).length - 1]] * 0.4;
+      setHeartRateData2(prevData => {
         // newData = Math.random() * 100;
         const chartData2 = [...prevData, newData2];
         return chartData2.slice(-200)
@@ -115,6 +92,13 @@ const DataScreen = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const data = [
+    { year: '2011', earnings: 13000 },
+    { year: '2012', earnings: 16500 },
+    { year: '2013', earnings: 14250 },
+    { year: '2014', earnings: 19000 }
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -125,7 +109,7 @@ const DataScreen = () => {
           {"Signal chart"}
         </Text>
 
-        <LiveChart data1={heartRateData1} data2={heartRateData2} width={width - 50} height={height - 150} />
+        <LiveChart data1={heartRateData1} data2={heartRateData2} width={width-50} height={height-150} />
 
         {/* Resemble data received button */}
         <TouchableOpacity
