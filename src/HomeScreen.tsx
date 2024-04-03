@@ -79,7 +79,7 @@ const Home = () => {
       </View> 
       
       {/* Go to the data screen */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => 
           navigation.navigate("DataScreen")
         }
@@ -87,7 +87,7 @@ const Home = () => {
         <Text style={styles.ctaButtonText}>
           {"Data Screen"}
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
         
       {/* Connect or disconnect device */}
       <TouchableOpacity
