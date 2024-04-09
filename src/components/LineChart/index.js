@@ -33,6 +33,8 @@ const LineChart = ({
     horizontalLineOpacity = 0.2,
     showVerticalLines = false,
     verticalLineOpacity = 0.2,
+    fixedHorizontalLines = true,
+    fixedLineIndex = 10,
     gradient_background_config = {
         stop1: {
             offset: 1,
@@ -67,14 +69,19 @@ const LineChart = ({
 
     useEffect(() => {
         const yKeys = data.map(item => item[y_key]);
-        console.log("array: ", yKeys);
         const yAxisData = yKeys;
         setAxisLabels(yAxisData);
     }, []);
 
     const calculateWidth = () => {
         const chartWidth = containerWidth - x_margin * 2;
-        const gap_between_ticks = chartWidth / (Object.keys(data).length - 1); // Get data in object using Object.keys() function
+        let gap_between_ticks = 0;
+        if(Object.keys(data).length === 0 || Object.keys(data).length === 1){
+            gap_between_ticks = chartWidth;
+        }else{
+            gap_between_ticks = chartWidth / (Object.keys(data).length - 1); // Get data in object using Object.keys() function
+        }
+
         return{
             chartWidth,
             gap_between_ticks,
@@ -94,7 +101,7 @@ const LineChart = ({
         const gap_between_ticks = actual_chart_height / (Object.keys(data).length - 1);
         const y_value_gap = (yMax - min) / (Object.keys(data).length - 1);
 
-        return {yMax, yMin, gap_between_ticks, y_value_gap, min};
+        return {yMax, yMin, actual_chart_height, gap_between_ticks, y_value_gap, min};
     };
 
     const render_background = () => {
@@ -278,13 +285,22 @@ const LineChart = ({
 
     const getDPath = () => {
         const {gap_between_ticks: x_gap} = calculateWidth();
-        const {gap_between_ticks: y_gap, yMax, y_value_gap} = calculateHeight();
+        const {gap_between_ticks: y_gap, yMax, y_value_gap, actual_chart_height} = calculateHeight();
         let dpath = '';
         let previousX = 0;
         let previousY = 0;
+        // console.log("yMax: ", yMax);
         data.map((item, index) => {
             let x = x_margin + x_gap * index;
-            let y = (yMax - item[y_key]) * (y_gap / y_value_gap) + y_margin;
+            let y = 0;
+            // let y = (yMax - item[y_key]) * (y_gap / y_value_gap) + y_margin;
+            // console.log("y_value_gap: ", y_value_gap);
+            
+            if (y_value_gap === 0){
+                y = (yMax - item[y_key]) + y_margin;
+            }else{
+                y = (yMax - item[y_key]) * (y_gap / y_value_gap) + y_margin;
+            }
 
             if(curve){
                 if (index === 0) {
@@ -326,23 +342,48 @@ const LineChart = ({
     }
 
     const render_horizontal_lines = () => {
-        const {gap_between_ticks} = calculateHeight();
-        return data.map((item, index) => {
-            const y = containerHeight - y_margin - gap_between_ticks*index;
-            return (
-                <G key={`horizontal_line_${index}`}>
-                    <Line 
-                        x1={x_margin}
-                        y1={y}
-                        x2={containerWidth - x_margin}
-                        y2={y}
-                        stroke={axisColor}
-                        strokeWidth={axisStrokeWidth}
-                        opacity={horizontalLineOpacity}
-                    />
-                </G>
-            );
-        });
+        const {fixed_gap_between_ticks} = calculateHeight();
+
+        const actual_chart_height = containerHeight - y_margin*2;
+        if(fixedHorizontalLines){
+            const gap_between_ticks = actual_chart_height / fixedLineIndex;
+            return data.map((item, index) => {
+                if (index <= fixedLineIndex){
+                    const y = containerHeight - y_margin - gap_between_ticks*index ;
+                    return (
+                        <G key={`horizontal_line_${index}`}>
+                            <Line 
+                                x1={x_margin}
+                                y1={y}
+                                x2={containerWidth - x_margin}
+                                y2={y}
+                                stroke={axisColor}
+                                strokeWidth={axisStrokeWidth}
+                                opacity={horizontalLineOpacity}
+                            />
+                        </G>
+                    );
+                };
+            });
+        }else{
+            const gap_between_ticks = actual_chart_height / (Object.keys(data).length - 1);
+            return data.map((item, index) => {
+                const y = containerHeight - y_margin - gap_between_ticks*index ;
+                return (
+                    <G key={`horizontal_line_${index}`}>
+                        <Line 
+                            x1={x_margin}
+                            y1={y}
+                            x2={containerWidth - x_margin}
+                            y2={y}
+                            stroke={axisColor}
+                            strokeWidth={axisStrokeWidth}
+                            opacity={horizontalLineOpacity}
+                        />
+                    </G>
+                );
+            });
+        };
     };
 
     const render_vertical_lines = () => {
@@ -400,11 +441,11 @@ const LineChart = ({
             {render_y_axis()}
             {Object.keys(data) && Object.keys(data).length > 0 && showHorizontalLines && render_horizontal_lines()}
             {Object.keys(data) && Object.keys(data).length > 0 && showVerticalLines && render_vertical_lines()}
-            {Object.keys(data) && Object.keys(data).length > 0 && render_x_axis_ticks()}
-            {Object.keys(data) && Object.keys(data).length > 0 && render_x_axis_labels()}
-            {Object.keys(data) && Object.keys(data).length > 0 && render_y_axis_ticks()}
-            {Object.keys(data) && Object.keys(data).length > 0 && render_y_axis_labels()}
-            {Object.keys(data) && Object.keys(data).length > 0 && render_line_circles()}
+            {/* {Object.keys(data) && Object.keys(data).length > 0 && render_x_axis_ticks()} */}
+            {/* {Object.keys(data) && Object.keys(data).length > 0 && render_x_axis_labels()} */}
+            {/* {Object.keys(data) && Object.keys(data).length > 0 && render_y_axis_ticks()} */}
+            {/* {Object.keys(data) && Object.keys(data).length > 0 && render_y_axis_labels()} */}
+            {/* {Object.keys(data) && Object.keys(data).length > 0 && render_line_circles()} */}
             {Object.keys(data) && Object.keys(data).length > 0 && render_line()}
 
             </Svg>
