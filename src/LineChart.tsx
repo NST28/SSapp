@@ -12,17 +12,21 @@ const LineCharts = () => {
         },
     ]);
 
+    // Get live data from BLE 
     const liveData = useContext(DataContext);
     var liveDataObj = liveData.liveData; 
 
-    const data_strim = 500;
+    // console.log(`Last value in Line chart: ${liveDataObj[Object.keys(liveDataObj).length - 1]}, array length: ${Object.keys(liveDataObj).length}`);
+    
+    const data_strim = 200;
   
     useEffect(() => {
         const interval = setInterval(() => {
             setTestDataSelf(prevData => {
                 const newMonth = getNewMonthName();
-                const newValue = 0;
-                const newData = [...prevData, { month: newMonth, value: newValue}];
+                const newValue = liveDataObj[Object.keys(liveDataObj).length - 1];
+                const newValueMap = newValue * 100 / 4096;
+                const newData = [...prevData, { month: newMonth, value: newValueMap}];
 
                 if (newData.length > data_strim) {
                     newData.splice(0, newData.length - data_strim);
@@ -30,19 +34,6 @@ const LineCharts = () => {
                 return newData;
             });
         }, 0); // Set time interval
-    
-        return () => clearInterval(interval);
-    }, []);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setTestDataSelf(prevData => {
-                const newMonth = getNewMonthName();
-                const newValue = Math.floor(Math.random() * 50);
-                const newData = [...prevData, { month: newMonth, value: newValue}];
-                return newData;
-            });
-        }, 1000); // Set time interval
     
         return () => clearInterval(interval);
     }, []);

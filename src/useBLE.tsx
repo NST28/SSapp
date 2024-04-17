@@ -33,6 +33,9 @@ function useBLE(): BluetoothLowEnergyApi {
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [heartRate, setHeartRate] = useState<number>(0);
+  
+  let firstTemp = 0;
+  let lastTemp = 0;
 
   const requestPermissions = async (cb: VoidCallback) => {
     if (Platform.OS === 'android') {
@@ -124,11 +127,26 @@ function useBLE(): BluetoothLowEnergyApi {
     }
 
     const rawData = atob(characteristic.value);
+    const rawDataSpit = rawData.split('\n');
+    console.log(`Raw split data: ${rawDataSpit}`);
 
-    console.log('New data received', rawData );
+    // setHeartRate(Number(rawDataSpit[0]));
 
-    var received_data = Number(rawData)
-    setHeartRate(received_data);
+    for ( var i = 0; i < rawDataSpit.length; i++ ) {
+      if (rawDataSpit[i] === 'Start'){
+        // firstDataTimestamp = Date.now();
+        firstTemp = Date.now();
+        console.log(`Start timestamp: ${firstTemp}`);
+      } else if (rawDataSpit[i] === 'Stop'){
+       lastTemp = Date.now();
+        console.log(`Last timestamp: ${lastTemp}`);
+        console.log(`First: ${firstTemp}, Last: ${lastTemp}, Time interval between: ${lastTemp - firstTemp} ms`);
+      } else {
+        if (Number(rawDataSpit[i]) <= 4096) {
+          setHeartRate(Number(rawDataSpit[i]));
+        };
+      };
+    };
   };
 
   const startStreamingData = async (device: Device) => {

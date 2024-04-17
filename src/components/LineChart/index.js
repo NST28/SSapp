@@ -297,9 +297,9 @@ const LineChart = ({
             // console.log("y_value_gap: ", y_value_gap);
             
             if (y_value_gap === 0){
-                y = (yMax - item[y_key]) + y_margin;
+                y = (yMax - item[y_key]) + y_margin - 10;
             }else{
-                y = (yMax - item[y_key]) * (y_gap / y_value_gap) + y_margin;
+                y = (yMax - item[y_key]) * (y_gap / y_value_gap) + y_margin - 10;
             }
 
             if(curve){
