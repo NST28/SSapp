@@ -95,7 +95,7 @@ function useBLE(): BluetoothLowEnergyApi {
 
   const connectToDevice = async (device: Device) => {
     try {
-      const deviceConnection = await bleManager.connectToDevice(device.id);
+      const deviceConnection = await bleManager.connectToDevice(device.id, {requestMTU: 187 });
       setConnectedDevice(deviceConnection);
       await deviceConnection.discoverAllServicesAndCharacteristics();
       bleManager.stopDeviceScan();
@@ -128,18 +128,14 @@ function useBLE(): BluetoothLowEnergyApi {
 
     const rawData = atob(characteristic.value);
     const rawDataSpit = rawData.split('\n');
+    const dataLenght = rawDataSpit.length;
     console.log(`Raw split data: ${rawDataSpit}`);
 
-    // setHeartRate(Number(rawDataSpit[0]));
-
-    for ( var i = 0; i < rawDataSpit.length; i++ ) {
+    for ( var i = 0; i < dataLenght; i++ ) {
       if (rawDataSpit[i] === 'Start'){
-        // firstDataTimestamp = Date.now();
         firstTemp = Date.now();
-        console.log(`Start timestamp: ${firstTemp}`);
       } else if (rawDataSpit[i] === 'Stop'){
        lastTemp = Date.now();
-        console.log(`Last timestamp: ${lastTemp}`);
         console.log(`First: ${firstTemp}, Last: ${lastTemp}, Time interval between: ${lastTemp - firstTemp} ms`);
       } else {
         if (Number(rawDataSpit[i]) <= 4096) {

@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import LineChart from "./components/LineChart";
-import { testData } from "./data";
-import { DataContext } from "./Context";
+import { View, Text, TouchableOpacity } from "react-native";
+import LineChart from "../components/LineChart";
+import { testData } from "../data";
+import { DataContext } from "../Context";
+import { globalStyles } from "../constants/globalStyles";
 
 const LineCharts = () => {
     const [testDataSelf, setTestDataSelf] = useState([
@@ -44,7 +45,7 @@ const LineCharts = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={globalStyles.container}>
             <Text>LineChart</Text>
             <LineChart 
                 data={Object.keys(testDataSelf).length > 1 ? testDataSelf : testData}
@@ -74,28 +75,5 @@ const LineCharts = () => {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    ctaButton: {
-        backgroundColor: 'purple',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginHorizontal: 25,
-        marginBottom: 10,
-        borderRadius: 8,
-        padding: 10,
-      },
-      ctaButtonText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: 'white',
-        marginHorizontal: 20,
-      },
-})
 
 export default LineCharts;

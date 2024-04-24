@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Device} from 'react-native-ble-plx';
+import { globalStyles } from '../constants/globalStyles';
 
 type DeviceModalListItemProps = {
   item: ListRenderItemInfo<Device>;
@@ -34,8 +35,8 @@ const DeviceModalListItem: FC<DeviceModalListItemProps> = props => {
   return (
     <TouchableOpacity
       onPress={connectAndCloseModal}
-      style={modalStyle.ctaButton}>
-      <Text style={modalStyle.ctaButtonText}>{item.item.name}</Text>
+      style={globalStyles.ctaButton}>
+      <Text style={globalStyles.ctaButtonText}>{item.item.name}</Text>
     </TouchableOpacity>
   );
 };
@@ -58,24 +59,24 @@ const DeviceModal: FC<DeviceModalProps> = props => {
 
   return (
     <Modal
-      style={modalStyle.modalContainer}
+      style={globalStyles.container}
       animationType="slide"
       transparent={false}
       visible={visible}>
-      <SafeAreaView style={modalStyle.modalTitle}>
-        <Text style={modalStyle.modalTitleText}>
+      <SafeAreaView style={globalStyles.container}>
+        <Text style={globalStyles.modalTitleText}>
           Tap on a device to connect
         </Text>
         <FlatList
-          contentContainerStyle={modalStyle.modalFlatlistContiner}
+          contentContainerStyle={globalStyles.modalFlatlistContiner}
           data={devices}
           renderItem={renderDeviceModalListItem}
         />
 
         <TouchableOpacity
           onPress={closeModal}
-          style={modalStyle.ctaButton}>
-          <Text style={modalStyle.ctaButtonText}>
+          style={globalStyles.ctaButton}>
+          <Text style={globalStyles.ctaButtonText}>
             {"Home Screen"}
           </Text>
         </TouchableOpacity>
@@ -83,51 +84,5 @@ const DeviceModal: FC<DeviceModalProps> = props => {
     </Modal>
   );
 };
-
-const modalStyle = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#f2f2f2',
-  },
-  modalFlatlistContiner: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  modalCellOutline: {
-    borderWidth: 1,
-    borderColor: 'black',
-    alignItems: 'center',
-    marginHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 8,
-  },
-  modalTitle: {
-    flex: 1,
-    backgroundColor: '#f2f2f2',
-  },
-  modalTitleText: {
-    marginTop: 40,
-    fontSize: 30,
-    color: 'black',
-    fontWeight: 'bold',
-    marginHorizontal: 20,
-    textAlign: 'center',
-  },
-  ctaButton: {
-    backgroundColor: 'purple',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 50,
-    marginHorizontal: 20,
-    marginBottom: 5,
-    borderRadius: 8,
-    padding: 10,
-  },
-  ctaButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-});
 
 export default DeviceModal;

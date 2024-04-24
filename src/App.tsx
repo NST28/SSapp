@@ -1,16 +1,10 @@
 import React from "react";
-import {View, Text, StyleSheet} from 'react-native';
-
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import Home from "./HomeScreen";
-import DataScreen from "./DataScreen";
+import Home from "./screens/HomeScreen";
 import { DataContextProvider } from "./Context";
-import LineCharts from "./LineChart";
-
-const Stack = createNativeStackNavigator();
+import LineCharts from "./screens/LineChart";
 
 const Drawer = createDrawerNavigator();
 

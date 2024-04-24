@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Button, AppRegistry } from 'react-native';
+import { SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import DeviceModal from './DeviceConnectionModal';
-import useBLE from './useBLE';
-import { DataContext } from './Context';
+import useBLE from '../useBLE';
+import { DataContext } from '../Context';
+import { globalStyles } from '../constants/globalStyles';
 
 let dataArray = [0];
 
@@ -63,37 +64,26 @@ const Home = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.heartRateTitleWrapper}>
+    <SafeAreaView style={globalStyles.container}>
+      <View style={globalStyles.heartRateTitleWrapper}>
         {connectedDevice ? (
           <>
             {/* <DataIndicator /> */}
-            <Text style={styles.heartRateTitleText}>Current Data:</Text>
-            <Text style={styles.heartRateText}>{heartRate}</Text>
+            <Text style={globalStyles.heartRateTitleText}>Current Data:</Text>
+            <Text style={globalStyles.heartRateText}>{heartRate}</Text>
           </>
         ) : (
-          <Text style={styles.heartRateTitleText}>
+          <Text style={globalStyles.heartRateTitleText}>
             Please Connect to a Bluetooth device
           </Text>
         )}
       </View> 
-      
-      {/* Go to the data screen */}
-      {/* <TouchableOpacity
-        onPress={() => 
-          navigation.navigate("DataScreen")
-        }
-        style={styles.ctaButton}>
-        <Text style={styles.ctaButtonText}>
-          {"Data Screen"}
-        </Text>
-      </TouchableOpacity> */}
         
       {/* Connect or disconnect device */}
       <TouchableOpacity
         onPress={connectedDevice ? disconnectFromDevice : openModal}
-        style={styles.ctaButton}>
-        <Text style={styles.ctaButtonText}>
+        style={globalStyles.ctaButton}>
+        <Text style={globalStyles.ctaButtonText}>
           {connectedDevice ? 'Disconnect' : 'Connect BLE Device'}
         </Text>
       </TouchableOpacity>
@@ -107,48 +97,5 @@ const Home = () => {
     </SafeAreaView>
   );
 };
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f2f2f2',
-  },
-  heartRateTitleWrapper: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  heartRateTitleText: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginHorizontal: 20,
-    color: 'black',
-  },
-  heartRateText: {
-    fontSize: 25,
-    marginTop: 15,
-    color: 'black',
-  },
-  ctaButton: {
-    backgroundColor: 'purple',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 50,
-    marginHorizontal: 20,
-    marginBottom: 5,
-    borderRadius: 8,
-    padding: 10,
-  },
-  ctaButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  chartContainer: {
-    marginBottom: 20,
-  },
-});
 
 export default Home;
