@@ -1,14 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useContext, FC, useCallback } from 'react';
+import { SafeAreaView, Text, TouchableOpacity, View, FlatList, Modal} from 'react-native';
 
-import DeviceModal from './DeviceConnectionModal';
 import useBLE from '../useBLE';
 import { DataContext } from '../Context';
 import { globalStyles } from '../constants/globalStyles';
 
 let dataArray = [0];
-
 
 function appendData(array, newData) {
   const lastValue = array[array.length - 1];
@@ -19,6 +16,67 @@ function appendData(array, newData) {
   
   return array;
 }
+
+const DeviceModalListItem: FC<DeviceModalListItemProps> = props => {
+  const { item, connectToPeripheral, closeModal } = props;
+
+  const connectAndCloseModal = useCallback(() => {
+    connectToPeripheral(item.item);
+    closeModal();
+  }, [closeModal, connectToPeripheral, item.item]);
+
+  return (
+    <TouchableOpacity
+      onPress={connectAndCloseModal}
+      style={globalStyles.ctaButton}>
+      <Text style={globalStyles.ctaButtonText}>{item.item.name}</Text>
+    </TouchableOpacity>
+  );
+};
+
+const DeviceModal: FC<DeviceModalProps> = props => {
+  const { devices, visible, connectToPeripheral, closeModal } = props;
+
+  const renderDeviceModalListItem = useCallback(
+    (item: ListRenderItemInfo<Device>) => {
+      return (
+        <DeviceModalListItem
+          item={item}
+          connectToPeripheral={connectToPeripheral}
+          closeModal={closeModal}
+        />
+      );
+    },
+    [closeModal, connectToPeripheral],
+  );
+
+  return (
+    <Modal
+      style={globalStyles.container}
+      animationType="slide"
+      transparent={false}
+      visible={visible}>
+      <SafeAreaView style={globalStyles.container}>
+        <Text style={globalStyles.modalTitleText}>
+          Tap on a device to connect
+        </Text>
+        <FlatList
+          contentContainerStyle={globalStyles.modalFlatlistContiner}
+          data={devices}
+          renderItem={renderDeviceModalListItem}
+        />
+
+        <TouchableOpacity
+          onPress={closeModal}
+          style={globalStyles.ctaButton}>
+          <Text style={globalStyles.ctaButtonText}>
+            {"Home Screen"}
+          </Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </Modal>
+  );
+};
 
 const Home = () => {
   const {
@@ -49,19 +107,17 @@ const Home = () => {
     setIsModalVisible(true);
   };
 
-  const navigation = useNavigation()
-
   const {setLiveData} = useContext(DataContext);
-  var Array = appendData(dataArray, heartRate);
+  // var Array = appendData(dataArray, heartRate);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLiveData(Array);
-    }, 0);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setLiveData(Array);
+  //   }, 0);
 
-    // Clean up interval
-    return () => clearInterval(interval);
-  }, []);
+  //   // Clean up interval
+  //   return () => clearInterval(interval);
+  // }, []);
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -70,7 +126,7 @@ const Home = () => {
           <>
             {/* <DataIndicator /> */}
             <Text style={globalStyles.heartRateTitleText}>Current Data:</Text>
-            <Text style={globalStyles.heartRateText}>{heartRate}</Text>
+            {/* <Text style={globalStyles.heartRateText}>{heartRate}</Text> */}
           </>
         ) : (
           <Text style={globalStyles.heartRateTitleText}>
