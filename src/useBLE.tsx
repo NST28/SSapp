@@ -32,7 +32,7 @@ interface BluetoothLowEnergyApi {
 function useBLE(): BluetoothLowEnergyApi {
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
-  const [heartRate, setHeartRate] = useState<number>(0);
+  const [heartRate, setHeartRate] = useState('');
   
   let firstTemp = 0;
   let lastTemp = 0;
@@ -83,7 +83,7 @@ function useBLE(): BluetoothLowEnergyApi {
       if (error) {
         console.log(error);
       }
-      if (device && device.name?.includes('SLAVE')) {
+      if (device && device.name !== null) {
         setAllDevices((prevState: Device[]) => {
           if (!isDuplicteDevice(prevState, device)) {
             return [...prevState, device];
@@ -95,11 +95,17 @@ function useBLE(): BluetoothLowEnergyApi {
 
   const connectToDevice = async (device: Device) => {
     try {
-      const deviceConnection = await bleManager.connectToDevice(device.id, {requestMTU: 187 });
+      const deviceConnection = await bleManager.connectToDevice(device.id);
       setConnectedDevice(deviceConnection);
       await deviceConnection.discoverAllServicesAndCharacteristics();
       bleManager.stopDeviceScan();
-      startStreamingData(deviceConnection);
+
+      deviceConnection.monitorCharacteristicForService(
+        BLE_UUID,
+        BLE_CHARACTERISTIC,
+        (error, characteristic) => onHeartRateUpdate(error, characteristic),
+      );
+
     } catch (e) {
       console.log('FAILED TO CONNECT', e);
     }
@@ -109,7 +115,7 @@ function useBLE(): BluetoothLowEnergyApi {
     if (connectedDevice) {
       bleManager.cancelDeviceConnection(connectedDevice.id);
       setConnectedDevice(null);
-      setHeartRate(0);
+      setHeartRate('');
     }
   };
 
@@ -127,34 +133,36 @@ function useBLE(): BluetoothLowEnergyApi {
     }
 
     const rawData = atob(characteristic.value);
-    const rawDataSpit = rawData.split('\n');
-    const dataLenght = rawDataSpit.length;
-    console.log(`Raw split data: ${rawDataSpit}`);
+    const rawDataSplit = rawData.split('\n');
+    // const dataLenght = rawDataSplit.length;
+    console.log(`Raw data: ${rawData}`);
+    // setHeartRate(prevData => [...prevData, rawData]);
 
-    for ( var i = 0; i < dataLenght; i++ ) {
-      if (rawDataSpit[i] === 'Start'){
-        firstTemp = Date.now();
-      } else if (rawDataSpit[i] === 'Stop'){
-       lastTemp = Date.now();
-        console.log(`First: ${firstTemp}, Last: ${lastTemp}, Time interval between: ${lastTemp - firstTemp} ms`);
-      } else {
-        if (Number(rawDataSpit[i]) <= 4096) {
-          setHeartRate(Number(rawDataSpit[i]));
-        };
-      };
-    };
-  };
+    // Get first data
+    // if (rawDataSplit.includes('Start')) {
+    //   firstTemp = Date.now();
+    // } else if (rawDataSplit.includes('Stop')) {
+    //   lastTemp = Date.now();
+    //   console.log(`First: ${firstTemp}, Last: ${lastTemp}, Time interval between: ${lastTemp - firstTemp} ms`);
+    // } else {
+    //   if (Number(rawDataSplit[0]) <= 4096) {
+    //     setHeartRate(Number(rawDataSplit[0]));
+    //   };
+    // };
 
-  const startStreamingData = async (device: Device) => {
-    if (device) {
-      device.monitorCharacteristicForService(
-        BLE_UUID,
-        BLE_CHARACTERISTIC,
-        (error, characteristic) => onHeartRateUpdate(error, characteristic),
-      );
-    } else {
-      console.log('No Device Connected');
-    }
+    // Loop all array
+    // for ( var i = 0; i < dataLenght; i++ ) {
+    //   if (rawDataSplit[i] === 'Start'){
+    //     firstTemp = Date.now();
+    //   } else if (rawDataSplit[i] === 'Stop'){
+    //    lastTemp = Date.now();
+    //     console.log(`First: ${firstTemp}, Last: ${lastTemp}, Time interval between: ${lastTemp - firstTemp} ms`);
+    //   } else {
+    //     if (Number(rawDataSplit[i]) <= 4096) {
+    //       setHeartRate(Number(rawDataSplit[i]));
+    //     };
+    //   };
+    // };
   };
 
   return {
