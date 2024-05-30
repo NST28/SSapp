@@ -10,7 +10,7 @@ const LineChart = ({
     y_key = 'value',
     onPressItem,
     height: containerHeight = 300,
-    width: containerWidth = SCREEN_WIDTH - 50,
+    width: containerWidth = SCREEN_WIDTH-20,
     backgroundColor = 'transparent',
     svgbackgroundColor = 'transparent',
     useGradientBackground = true,
@@ -34,7 +34,8 @@ const LineChart = ({
     showVerticalLines = false,
     verticalLineOpacity = 0.2,
     fixedHorizontalLines = true,
-    fixedLineIndex = 10,
+    fixedLineIndex = 4,
+    fixedXLineIndex = 5,
     gradient_background_config = {
         stop1: {
             offset: 1,
@@ -64,7 +65,7 @@ const LineChart = ({
 
 }) => {
     const [yAxisLabels, setAxisLabels] = useState([]);
-    const x_margin = 50;
+    const x_margin = 60;
     const y_margin = 50;
 
     useEffect(() => {
@@ -99,7 +100,7 @@ const LineChart = ({
         let min = 0;
         const actual_chart_height = containerHeight - y_margin*2;
         const gap_between_ticks = actual_chart_height / (Object.keys(data).length - 1);
-        const y_value_gap = (yMax - min) / (Object.keys(data).length - 1);
+        const y_value_gap = (actual_chart_height - min) / (Object.keys(data).length - 1);
 
         return {yMax, yMin, actual_chart_height, gap_between_ticks, y_value_gap, min};
     };
@@ -196,6 +197,85 @@ const LineChart = ({
         });
     };
 
+    const self_render_x_axis_ticks = () => {
+        const chartWidth = containerWidth - x_margin * 2;
+        let gap_between_ticks = chartWidth / fixedXLineIndex;
+        const {fontSize, textAnchor, fill, fontWeight, rotation} = x_axis_config;
+
+        return(
+            <G>
+                <Line
+                    x1={x_margin + gap_between_ticks*0}
+                    y1={containerHeight - y_margin}
+                    x2={x_margin + gap_between_ticks*0}
+                    y2={containerHeight - y_margin + 5}
+                    stroke={axisColor}
+                    strokeWidth={axisStrokeWidth}
+                />
+                <Line
+                    x1={x_margin + gap_between_ticks*1}
+                    y1={containerHeight - y_margin}
+                    x2={x_margin + gap_between_ticks*1}
+                    y2={containerHeight - y_margin + 5}
+                    stroke={axisColor}
+                    strokeWidth={axisStrokeWidth}
+                />
+                <Line
+                    x1={x_margin + gap_between_ticks*2}
+                    y1={containerHeight - y_margin}
+                    x2={x_margin + gap_between_ticks*2}
+                    y2={containerHeight - y_margin + 5}
+                    stroke={axisColor}
+                    strokeWidth={axisStrokeWidth}
+                />
+                <Line
+                    x1={x_margin + gap_between_ticks*3}
+                    y1={containerHeight - y_margin}
+                    x2={x_margin + gap_between_ticks*3}
+                    y2={containerHeight - y_margin + 5}
+                    stroke={axisColor}
+                    strokeWidth={axisStrokeWidth}
+                />
+                <Line
+                    x1={x_margin + gap_between_ticks*4}
+                    y1={containerHeight - y_margin}
+                    x2={x_margin + gap_between_ticks*4}
+                    y2={containerHeight - y_margin + 5}
+                    stroke={axisColor}
+                    strokeWidth={axisStrokeWidth}
+                />
+                <Line
+                    x1={x_margin + gap_between_ticks*5}
+                    y1={containerHeight - y_margin}
+                    x2={x_margin + gap_between_ticks*5}
+                    y2={containerHeight - y_margin + 5}
+                    stroke={axisColor}
+                    strokeWidth={axisStrokeWidth}
+                />
+                <SvgText
+                    // key={'a_axis_label-${index}'}
+                    x={x_margin + gap_between_ticks*5}
+                    y={containerHeight - y_margin + 15}
+                    fontSize={fontSize}
+                    fill={fill}
+                    fontWeight={fontWeight}
+                    textAnchor={textAnchor}
+                    >{"t"}
+                </SvgText>
+
+                <SvgText
+                    x={x_margin + gap_between_ticks*2.5}
+                    y={containerHeight - y_margin + 10 + 36}
+                    fontSize={fontSize + 5}
+                    fill={fill}
+                    fontWeight={fontWeight}
+                    textAnchor={textAnchor}
+                    >{'Timestamp (ms)'}
+                </SvgText>
+            </G>
+        );
+    };
+
     const render_x_axis_labels = () => {
         const {gap_between_ticks} = calculateWidth();
         const {fontSize, textAnchor, fill, fontWeight, rotation} = x_axis_config;
@@ -235,6 +315,118 @@ const LineChart = ({
                 </G>
             )
         })
+    };
+
+    const self_render_y_axis_ticks = () => {
+        // const {gap_between_ticks} = calculateHeight();
+
+        const actual_chart_height = containerHeight - y_margin*2;
+        const gap_between_ticks = actual_chart_height / fixedLineIndex;
+        const {fontSize, textAnchor, fill, fontWeight, rotation} = y_axis_config;
+        return (
+            <G>
+                <Line
+                    x1={x_margin}
+                    y1={containerHeight - y_margin - gap_between_ticks * 0}
+                    x2={x_margin-5}
+                    y2={containerHeight - y_margin - gap_between_ticks * 0}
+                    stroke={axisColor}
+                    strokeWidth={axisStrokeWidth}
+                />
+                <SvgText
+                    x={x_margin - fontSize/2}
+                    y={containerHeight - y_margin - gap_between_ticks * 0 + fontSize/3}
+                    textAnchor={textAnchor}
+                    fontWeight={fontWeight}
+                    fontSize={fontSize}
+                    fill={fill}
+                    >{0}
+                </SvgText>
+                
+                <Line
+                    x1={x_margin}
+                    y1={containerHeight - y_margin - gap_between_ticks * 1}
+                    x2={x_margin-5}
+                    y2={containerHeight - y_margin - gap_between_ticks * 1}
+                    stroke={axisColor}
+                    strokeWidth={axisStrokeWidth}
+                />
+                <SvgText
+                    x={x_margin - fontSize/2}
+                    y={containerHeight - y_margin - gap_between_ticks * 1 + fontSize/3}
+                    textAnchor={textAnchor}
+                    fontWeight={fontWeight}
+                    fontSize={fontSize}
+                    fill={fill}
+                    >{2}
+                </SvgText>
+
+                <Line
+                    x1={x_margin}
+                    y1={containerHeight - y_margin - gap_between_ticks * 2}
+                    x2={x_margin-5}
+                    y2={containerHeight - y_margin - gap_between_ticks * 2}
+                    stroke={axisColor}
+                    strokeWidth={axisStrokeWidth}
+                />
+                <SvgText
+                    x={x_margin - fontSize/2}
+                    y={containerHeight - y_margin - gap_between_ticks * 2 + fontSize/3}
+                    textAnchor={textAnchor}
+                    fontWeight={fontWeight}
+                    fontSize={fontSize}
+                    fill={fill}
+                    >{4}
+                </SvgText>
+
+                <Line
+                    x1={x_margin}
+                    y1={containerHeight - y_margin - gap_between_ticks * 3}
+                    x2={x_margin-5}
+                    y2={containerHeight - y_margin - gap_between_ticks * 3}
+                    stroke={axisColor}
+                    strokeWidth={axisStrokeWidth}
+                />
+                <SvgText
+                    x={x_margin - fontSize/2}
+                    y={containerHeight - y_margin - gap_between_ticks * 3 + fontSize/3}
+                    textAnchor={textAnchor}
+                    fontWeight={fontWeight}
+                    fontSize={fontSize}
+                    fill={fill}
+                    >{6}
+                </SvgText>
+
+                <Line
+                    x1={x_margin}
+                    y1={containerHeight - y_margin - gap_between_ticks * 4}
+                    x2={x_margin-5}
+                    y2={containerHeight - y_margin - gap_between_ticks * 4}
+                    stroke={axisColor}
+                    strokeWidth={axisStrokeWidth}
+                />
+                <SvgText
+                    x={x_margin - fontSize/2}
+                    y={containerHeight - y_margin - gap_between_ticks * 4 + fontSize/3}
+                    textAnchor={textAnchor}
+                    fontWeight={fontWeight}
+                    fontSize={fontSize}
+                    fill={fill}
+                    >{8}
+                </SvgText>
+
+                <SvgText
+                    x={0}
+                    y={0}
+                    fontSize={fontSize+ 5}
+                    fill={fill}
+                    fontWeight={fontWeight}
+                    textAnchor={"middle"}
+                    transform="translate(27,150) rotate(270)"
+                    >{'Sample Value (Bar)'}
+                </SvgText>
+            </G>
+        )
     };
 
     const render_y_axis_labels = () => {
@@ -293,13 +485,12 @@ const LineChart = ({
         data.map((item, index) => {
             let x = x_margin + x_gap * index;
             let y = 0;
-            // let y = (yMax - item[y_key]) * (y_gap / y_value_gap) + y_margin;
-            // console.log("y_value_gap: ", y_value_gap);
             
             if (y_value_gap === 0){
-                y = (yMax - item[y_key]) + y_margin - 10;
+                y = (actual_chart_height - item[y_key]) + y_margin;
             }else{
-                y = (yMax - item[y_key]) * (y_gap / y_value_gap) + y_margin - 10;
+                // y = (yMax - item[y_key]) * (y_gap / y_value_gap) + y_margin;
+                y = (actual_chart_height - item[y_key]) * (y_gap / y_value_gap) + y_margin;
             }
 
             if(curve){
@@ -439,14 +630,16 @@ const LineChart = ({
             {useGradientBackground && render_background()}
             {render_x_axis()}
             {render_y_axis()}
-            {Object.keys(data) && Object.keys(data).length > 0 && showHorizontalLines && render_horizontal_lines()}
-            {Object.keys(data) && Object.keys(data).length > 0 && showVerticalLines && render_vertical_lines()}
+            {/* {Object.keys(data) && Object.keys(data).length > 0 && showHorizontalLines && render_horizontal_lines()} */}
+            {/* {Object.keys(data) && Object.keys(data).length > 0 && showVerticalLines && render_vertical_lines()} */}
             {/* {Object.keys(data) && Object.keys(data).length > 0 && render_x_axis_ticks()} */}
             {/* {Object.keys(data) && Object.keys(data).length > 0 && render_x_axis_labels()} */}
             {/* {Object.keys(data) && Object.keys(data).length > 0 && render_y_axis_ticks()} */}
             {/* {Object.keys(data) && Object.keys(data).length > 0 && render_y_axis_labels()} */}
             {/* {Object.keys(data) && Object.keys(data).length > 0 && render_line_circles()} */}
             {Object.keys(data) && Object.keys(data).length > 0 && render_line()}
+            {self_render_x_axis_ticks()}
+            {self_render_y_axis_ticks()}
 
             </Svg>
         </View>

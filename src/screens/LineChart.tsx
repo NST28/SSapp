@@ -17,16 +17,14 @@ const LineCharts = () => {
     const liveData = useContext(DataContext);
     var liveDataObj = liveData.liveData; 
 
-    // console.log(`Last value in Line chart: ${liveDataObj[Object.keys(liveDataObj).length - 1]}, array length: ${Object.keys(liveDataObj).length}`);
-    
-    const data_strim = 200;
+    const data_strim = 50;
   
     useEffect(() => {
         const interval = setInterval(() => {
             setTestDataSelf(prevData => {
                 const newMonth = getNewMonthName();
                 const newValue = liveDataObj[Object.keys(liveDataObj).length - 1];
-                const newValueMap = newValue * 100 / 4096;
+                const newValueMap = newValue * 200 / 4096;
                 const newData = [...prevData, { month: newMonth, value: newValueMap}];
 
                 if (newData.length > data_strim) {
@@ -46,14 +44,14 @@ const LineCharts = () => {
 
     return (
         <View style={globalStyles.container}>
-            <Text>LineChart</Text>
+            <Text style={globalStyles.heartRateText}>Sample Chart</Text>
             <LineChart 
                 data={Object.keys(testDataSelf).length > 1 ? testDataSelf : testData}
                 // data={testDataSelf}
                 onPressItem={item => console.log(item)}
                 backgroundColor="transparent"
                 svgbackgroundColor="transparent"
-                useGradientBackground={true} 
+                useGradientBackground={false} 
                 gradient_background_config={{
                     stop1:{
                         offset: 0,

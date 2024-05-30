@@ -32,10 +32,13 @@ interface BluetoothLowEnergyApi {
 function useBLE(): BluetoothLowEnergyApi {
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
-  const [heartRate, setHeartRate] = useState('');
+  const [heartRate, setHeartRate] = useState<number>(0);
   
   let firstTemp = 0;
   let lastTemp = 0;
+  let queue = '';
+  let count = 0;
+  let average = 0;
 
   const requestPermissions = async (cb: VoidCallback) => {
     if (Platform.OS === 'android') {
@@ -115,7 +118,7 @@ function useBLE(): BluetoothLowEnergyApi {
     if (connectedDevice) {
       bleManager.cancelDeviceConnection(connectedDevice.id);
       setConnectedDevice(null);
-      setHeartRate('');
+      setHeartRate(0);
     }
   };
 
@@ -134,35 +137,39 @@ function useBLE(): BluetoothLowEnergyApi {
 
     const rawData = atob(characteristic.value);
     const rawDataSplit = rawData.split('\n');
-    // const dataLenght = rawDataSplit.length;
-    console.log(`Raw data: ${rawData}`);
-    // setHeartRate(prevData => [...prevData, rawData]);
+    const dataLenght = rawDataSplit.length;
 
-    // Get first data
-    // if (rawDataSplit.includes('Start')) {
-    //   firstTemp = Date.now();
-    // } else if (rawDataSplit.includes('Stop')) {
-    //   lastTemp = Date.now();
-    //   console.log(`First: ${firstTemp}, Last: ${lastTemp}, Time interval between: ${lastTemp - firstTemp} ms`);
-    // } else {
-    //   if (Number(rawDataSplit[0]) <= 4096) {
-    //     setHeartRate(Number(rawDataSplit[0]));
-    //   };
-    // };
+    for ( var i = 0; i < dataLenght; i++ ) {
+      // Create timestampt when receive first sample
+      if (rawDataSplit[i] === 'Start'){
+        firstTemp = Date.now();
+      } else if (rawDataSplit[i] === 'Stop'){ // Calculate time spent for receiving data
+        lastTemp = Date.now();
+        console.log(`First: ${firstTemp}, Last: ${lastTemp}, Time interval between: ${lastTemp - firstTemp} ms`);
+        queue = '';
+        count = 0;
+      } else { // Push data to buffer and decode
+        queue += rawDataSplit[i];
 
-    // Loop all array
-    // for ( var i = 0; i < dataLenght; i++ ) {
-    //   if (rawDataSplit[i] === 'Start'){
-    //     firstTemp = Date.now();
-    //   } else if (rawDataSplit[i] === 'Stop'){
-    //    lastTemp = Date.now();
-    //     console.log(`First: ${firstTemp}, Last: ${lastTemp}, Time interval between: ${lastTemp - firstTemp} ms`);
-    //   } else {
-    //     if (Number(rawDataSplit[i]) <= 4096) {
-    //       setHeartRate(Number(rawDataSplit[i]));
-    //     };
-    //   };
-    // };
+        while(queue !== '' && queue.length % 2 == 0 && count < 10000){
+          // Pop 2 characters from queue to get the encoded data
+          let popped = queue.slice(0,2);
+          queue = queue.slice(2);
+
+          // Decode data
+          let converted = (popped[0].charCodeAt(0) - 48)*64 + popped[1].charCodeAt(0) - 48;
+          count += 1;
+          average += converted;
+
+          if(count % 20 === 0){
+            average = Math.ceil(average/20);
+            setHeartRate(average);
+            average = 0;
+          }
+          console.log(`Data: ${popped}, Converted: ${converted}, Total: ${count}`);
+        }
+      };
+    };
   };
 
   return {

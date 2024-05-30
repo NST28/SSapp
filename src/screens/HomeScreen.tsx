@@ -108,16 +108,16 @@ const Home = () => {
   };
 
   const {setLiveData} = useContext(DataContext);
-  // var Array = appendData(dataArray, heartRate);
+  var Array = appendData(dataArray, heartRate);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setLiveData(Array);
-  //   }, 0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveData(Array);
+    }, 0);
 
-  //   // Clean up interval
-  //   return () => clearInterval(interval);
-  // }, []);
+    // Clean up interval
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -126,7 +126,7 @@ const Home = () => {
           <>
             {/* <DataIndicator /> */}
             <Text style={globalStyles.heartRateTitleText}>Current Data:</Text>
-            {/* <Text style={globalStyles.heartRateText}>{heartRate}</Text> */}
+            <Text style={globalStyles.heartRateText}>{heartRate}</Text>
           </>
         ) : (
           <Text style={globalStyles.heartRateTitleText}>

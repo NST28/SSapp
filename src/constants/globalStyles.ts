@@ -6,6 +6,8 @@ export const globalStyles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: '#f2f2f2',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     heartRateTitleWrapper: {
         flex: 1,

@@ -14,7 +14,7 @@ const App = () => {
         <DataContextProvider>
           <Drawer.Navigator>
             <Drawer.Screen name="Home" component={Home}/>
-            <Drawer.Screen name="LineCharts" component={LineCharts} />
+            <Drawer.Screen name="Chart" component={LineCharts} />
           </Drawer.Navigator>
         </DataContextProvider>
       </NavigationContainer>
