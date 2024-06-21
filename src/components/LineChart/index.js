@@ -177,26 +177,6 @@ const LineChart = ({
         )
     };
 
-    const render_x_axis_ticks = () => {
-        const {gap_between_ticks} = calculateWidth();
-        return data.map((item, index) => {
-            const x = x_margin + gap_between_ticks*index;
-            const y = containerHeight - y_margin;
-            return(
-                <G key={`x_axis_ticks-${index}`}>
-                    <Line
-                        x1={x}
-                        y1={y}
-                        x2={x}
-                        y2={y + 10}
-                        stroke={axisColor}
-                        strokeWidth={axisStrokeWidth}
-                    />
-                </G>
-            );
-        });
-    };
-
     const self_render_x_axis_ticks = () => {
         const chartWidth = containerWidth - x_margin * 2;
         let gap_between_ticks = chartWidth / fixedXLineIndex;
@@ -274,47 +254,6 @@ const LineChart = ({
                 </SvgText>
             </G>
         );
-    };
-
-    const render_x_axis_labels = () => {
-        const {gap_between_ticks} = calculateWidth();
-        const {fontSize, textAnchor, fill, fontWeight, rotation} = x_axis_config;
-        return data.map((item, index) => {
-            const x = x_margin + gap_between_ticks * index;
-            const y = containerHeight - y_margin + 10 + 12;
-            return (
-                <SvgText
-                    // key={'a_axis_label-${index}'}
-                    key={`x_axis_label-${index}`}
-                    x={x}
-                    y={y}
-                    fontSize={fontSize}
-                    fill={fill}
-                    fontWeight={fontWeight}
-                    textAnchor={textAnchor}
-                    >{item[x_key]}
-                </SvgText>
-            ); 
-        });
-    };
-
-    const render_y_axis_ticks = () => {
-        const {gap_between_ticks} = calculateHeight();
-        return data.map((item, index) => {
-            const y = containerHeight - y_margin - gap_between_ticks * index;
-            return (
-                <G key={`x_axis_ticks-${index}`}>
-                    <Line
-                        x1={x_margin}
-                        y1={y}
-                        x2={x_margin-10}
-                        y2={y}
-                        stroke={axisColor}
-                        strokeWidth={axisStrokeWidth}
-                    />
-                </G>
-            )
-        })
     };
 
     const self_render_y_axis_ticks = () => {
@@ -427,29 +366,6 @@ const LineChart = ({
                 </SvgText>
             </G>
         )
-    };
-
-    const render_y_axis_labels = () => {
-        const {gap_between_ticks, min, yMax} = calculateHeight();
-        const {fontSize, textAnchor, fill, fontWeight, rotation} = y_axis_config;
-        const x = x_margin - 13;
-        return yAxisLabels.map((item, index) => {
-            const y = containerHeight - y_margin - gap_between_ticks * index;
-            const dataPoints = Object.keys(data).length - 1;
-            const textValue = min + (yMax / dataPoints) * index;
-            return (
-                <G key={`y_axis_labels-${index}`}>
-                <SvgText
-                    x={x}
-                    y={y + fontSize / 3}
-                    textAnchor={textAnchor}
-                    fontWeight={fontWeight}
-                    fontSize={fontSize}
-                    fill={fill}
-                >{textValue}</SvgText>
-                </G>
-            );
-        });
     };
 
     const render_line_circles = () => {
