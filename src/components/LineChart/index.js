@@ -36,6 +36,10 @@ const LineChart = ({
     fixedHorizontalLines = true,
     fixedLineIndex = 4,
     fixedXLineIndex = 5,
+    common_front_size = 12,
+    common_textAnchor = 'middle',
+    common_fill = '#000',
+    common_fontWeight = '400',
     gradient_background_config = {
         stop1: {
             offset: 1,
@@ -556,6 +560,17 @@ const LineChart = ({
             {Object.keys(data) && Object.keys(data).length > 0 && render_line()}
             {self_render_x_axis_ticks()}
             {self_render_y_axis_ticks()}
+
+            <SvgText
+                x={x_margin + 285}
+                // y={containerHeight - y_margin}
+                y={containerHeight - data[Object.keys(data).length - 1][y_key] - y_margin + 5}
+                fontSize={common_front_size}
+                fill={common_fill}
+                fontWeight={common_fontWeight}
+                textAnchor={common_textAnchor}
+                >{(data[Object.keys(data).length - 1][y_key]*8/200).toFixed(2)}
+            </SvgText>
 
             </Svg>
         </View>

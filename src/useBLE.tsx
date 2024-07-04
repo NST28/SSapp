@@ -151,7 +151,7 @@ function useBLE(): BluetoothLowEnergyApi {
       } else { // Push data to buffer and decode
         queue += rawDataSplit[i];
 
-        while(queue !== '' && queue.length % 2 == 0 && count < 10000){
+        while(queue !== '' && queue.length % 2 == 0){
           // Pop 2 characters from queue to get the encoded data
           let popped = queue.slice(0,2);
           queue = queue.slice(2);
@@ -161,12 +161,14 @@ function useBLE(): BluetoothLowEnergyApi {
           count += 1;
           average += converted;
 
-          if(count % 20 === 0){
-            average = Math.ceil(average/20);
+          // setHeartRate(converted);
+
+          if(count % 15 === 0){
+            average = Math.ceil(average/15);
             setHeartRate(average);
             average = 0;
           }
-          console.log(`Data: ${popped}, Converted: ${converted}, Total: ${count}`);
+          console.log(`Data: ${popped}, Converted: ${converted}`);
         }
       };
     };

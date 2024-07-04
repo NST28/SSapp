@@ -5,9 +5,7 @@ import { Dimensions } from 'react-native';
 export const globalStyles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#f2f2f2',
-      justifyContent: 'center',
-      alignItems: 'center',
+      backgroundColor: '#f2f2f2'
     },
     heartRateTitleWrapper: {
         flex: 1,

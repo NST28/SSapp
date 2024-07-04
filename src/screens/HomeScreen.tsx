@@ -3,6 +3,7 @@ import { SafeAreaView, Text, TouchableOpacity, View, FlatList, Modal} from 'reac
 
 import useBLE from '../useBLE';
 import { DataContext } from '../Context';
+import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from '../constants/globalStyles';
 
 let dataArray = [0];
@@ -107,6 +108,8 @@ const Home = () => {
     setIsModalVisible(true);
   };
 
+  const navigation = useNavigation();
+
   const {setLiveData} = useContext(DataContext);
   var Array = appendData(dataArray, heartRate);
 
@@ -143,6 +146,16 @@ const Home = () => {
           {connectedDevice ? 'Disconnect' : 'Connect BLE Device'}
         </Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => 
+            navigation.navigate("Chart")
+        }
+        style={globalStyles.ctaButton}>
+        <Text style={globalStyles.ctaButtonText}>
+        {"Data Chart"}
+        </Text>
+    </TouchableOpacity>
 
       <DeviceModal
         closeModal={hideModal}

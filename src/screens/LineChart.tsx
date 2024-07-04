@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import {SafeAreaView, View, Text, TouchableOpacity } from "react-native";
 import LineChart from "../components/LineChart";
 import { testData } from "../data";
 import { DataContext } from "../Context";
+import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from "../constants/globalStyles";
 
 const LineCharts = () => {
@@ -13,11 +14,13 @@ const LineCharts = () => {
         },
     ]);
 
+    const navigation = useNavigation();
+
     // Get live data from BLE 
     const liveData = useContext(DataContext);
     var liveDataObj = liveData.liveData; 
 
-    const data_strim = 50;
+    const data_strim = 100;
   
     useEffect(() => {
         const interval = setInterval(() => {
@@ -43,34 +46,47 @@ const LineCharts = () => {
     };
 
     return (
-        <View style={globalStyles.container}>
-            <Text style={globalStyles.heartRateText}>Sample Chart</Text>
-            <LineChart 
-                data={Object.keys(testDataSelf).length > 1 ? testDataSelf : testData}
-                // data={testDataSelf}
-                onPressItem={item => console.log(item)}
-                backgroundColor="transparent"
-                svgbackgroundColor="transparent"
-                useGradientBackground={false} 
-                gradient_background_config={{
-                    stop1:{
-                        offset: 0,
-                        stopColor: '#6491d9',
-                        stopOpacity: 0.4,
-                    },
-                    stop2:{
-                        offset: 1,
-                        stopColor: '#35578f',
-                        stopOpacity: 0.8,
-                    },
-                }}
-                curve={false} 
-                showHorizontalLines = {true}
-                horizontalLineOpacity = {0.2}
-                showVerticalLines = {false}
-                verticalLineOpacity = {0.2}
-            />
-        </View>
+        <SafeAreaView style={globalStyles.container}>
+            <View style={globalStyles.heartRateTitleWrapper}>
+                <Text style={globalStyles.heartRateText}>Sample Chart</Text>
+                <LineChart 
+                    data={Object.keys(testDataSelf).length > 1 ? testDataSelf : testData}
+                    // data={testDataSelf}
+                    onPressItem={item => console.log(item)}
+                    backgroundColor="transparent"
+                    svgbackgroundColor="transparent"
+                    useGradientBackground={false} 
+                    gradient_background_config={{
+                        stop1:{
+                            offset: 0,
+                            stopColor: '#6491d9',
+                            stopOpacity: 0.4,
+                        },
+                        stop2:{
+                            offset: 1,
+                            stopColor: '#35578f',
+                            stopOpacity: 0.8,
+                        },
+                    }}
+                    curve={false} 
+                    showHorizontalLines = {true}
+                    horizontalLineOpacity = {0.2}
+                    showVerticalLines = {false}
+                    verticalLineOpacity = {0.2}
+                />
+            </View>
+            
+
+            <TouchableOpacity
+                onPress={() => 
+                    navigation.navigate("Home")
+                }
+                style={globalStyles.ctaButton}>
+                <Text style={globalStyles.ctaButtonText}>
+                {"Home Screen"}
+                </Text>
+            </TouchableOpacity>
+        </SafeAreaView>
     )
 }
 
