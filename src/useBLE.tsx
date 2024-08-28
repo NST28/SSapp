@@ -151,7 +151,10 @@ function useBLE(): BluetoothLowEnergyApi {
       } else { // Push data to buffer and decode
         queue += rawDataSplit[i];
 
-        while(queue !== '' && queue.length % 2 == 0){
+        while(queue !== ''){
+          if (queue.length === 1){
+            break;
+          }
           // Pop 2 characters from queue to get the encoded data
           let popped = queue.slice(0,2);
           queue = queue.slice(2);
@@ -169,7 +172,7 @@ function useBLE(): BluetoothLowEnergyApi {
             average = 0;
           }
           console.log(`Data: ${popped}, Converted: ${converted}`);
-        }
+        };
       };
     };
   };

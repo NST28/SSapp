@@ -46,7 +46,7 @@ export const globalStyles = StyleSheet.create({
 
     // Button
     ctaButton: {
-        backgroundColor: 'purple',
+        backgroundColor: '#1f386e',
         justifyContent: 'center',
         alignItems: 'center',
         marginHorizontal: 25,
