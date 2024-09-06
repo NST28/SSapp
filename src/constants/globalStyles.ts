@@ -82,4 +82,10 @@ export const globalStyles = StyleSheet.create({
         marginHorizontal: 20,
         textAlign: 'center',
     },
+    rowView: {
+        justifyContent: 'space-around',
+        alignItems: 'flex-start',
+        flexDirection: 'row',
+        color: 'black',
+      },
 });

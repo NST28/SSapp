@@ -3,12 +3,13 @@ import { SafeAreaView, Text, TouchableOpacity, View, FlatList, Modal, Permission
 import {PERMISSIONS, requestMultiple} from 'react-native-permissions';
 import DeviceInfo from 'react-native-device-info';
 
-import { atob } from 'react-native-quick-base64';
+import { atob, btoa } from 'react-native-quick-base64';
 import { BleManager, Device } from 'react-native-ble-plx';
 
 import { DataContext } from '../Context';
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from '../constants/globalStyles';
+import CheckBox from '@react-native-community/checkbox';
 
 //Setup variables
 let dataArray = [0];
@@ -28,6 +29,23 @@ function appendData(array, newData) {
   }
   
   return array;
+}
+
+function StringToBool(input: String) {
+  if (input == '1') {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// Convert box value from Bool type to String type
+function BoolToString(input: boolean) {
+  if (input == true) {
+    return '1';
+  } else {
+    return '0';
+  }
 }
 
 // Setup BLE manager class
@@ -121,6 +139,9 @@ const Home = () => {
 
   //What device is connected?
   const [connectedDevice, setConnectedDevice] = useState<Device>();
+
+  // Setup date to send back to cỉcuit
+  const [boxvalue, setBoxValue] = useState(false);
   
   // Request permissions from devices
   async function requestPermissions(cb: VoidCallback) {
@@ -255,13 +276,29 @@ const Home = () => {
                     setAnalogValve(average);
                     average = 0;
                   }
-                  console.log(`Data: ${popped}, Converted: ${converted}`);
+                  // console.log(`Data: ${popped}, Converted: ${converted}`);
                 };
               };
             };
           },
           'messagetransaction',
         );
+
+        // //BoxValue
+        // device.monitorCharacteristicForService(
+        //   BLE_UUID,
+        //   CALIBRATE_UUID,
+        //   (error, characteristic) => {
+        //     if (characteristic?.value != null) {
+        //       setBoxValue(StringToBool(atob(characteristic?.value)));
+        //       console.log(
+        //         'Box Value update received: ',
+        //         atob(characteristic?.value),
+        //       );
+        //     }
+        //   },
+        //   'boxtransaction',
+        // );
 
         console.log('Connection established');
       });
@@ -288,6 +325,19 @@ const Home = () => {
     }
   }
 
+  //Function to send data to circuit
+  async function sendBoxValue(value: boolean) {
+    BLTManager.writeCharacteristicWithResponseForDevice(
+      connectedDevice.id,
+      BLE_UUID,
+      BLE_CHARACTERISTIC,
+      btoa(BoolToString(value)),
+      // value.toString(),
+    ).then(characteristic => {
+      console.log('Box value changed to :', value, 'Msgs sent: ', BoolToString(value), 'Base64 type: ', btoa(BoolToString(value)));
+    });
+  }
+
   // Setup manager for connection route between screens 
   const navigation = useNavigation();
 
@@ -297,7 +347,7 @@ const Home = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setLiveData(Array);
-    }, 0);
+    }, 1);
 
     // Clean up interval
     return () => clearInterval(interval);
@@ -318,6 +368,19 @@ const Home = () => {
           </Text>
         )}
       </View> 
+
+      {/* Checkbox */}
+      <View style={globalStyles.rowView}>
+        <CheckBox
+          disabled={false}
+          onTintColor={'black'}
+          value={boxvalue}
+          onValueChange={newValue => {
+            setBoxValue(newValue);
+            sendBoxValue(newValue);
+          }}
+        />
+      </View>
         
       {/* Connect or disconnect device */}
       <TouchableOpacity
