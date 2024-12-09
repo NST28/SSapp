@@ -267,13 +267,15 @@ const Home = () => {
                   queue = queue.slice(2);
         
                   // Decode data
-                  let converted = (popped[0].charCodeAt(0) - 48)*64 + popped[1].charCodeAt(0) - 48;
+                  let converted = (popped[1].charCodeAt(0) - 48)*64 + popped[0].charCodeAt(0) - 48;
                   count += 1;
                   average += converted;
+                  console.log(`Data received: ${popped}, converted value: ${converted}`);
         
                   if(count % 15 === 0){
                     average = Math.ceil(average/15);
                     setAnalogValve(average);
+                    console.log('connecting to Device:', average);
                     average = 0;
                   }
                   // console.log(`Data: ${popped}, Converted: ${converted}`);
