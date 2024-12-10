@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import Home from "./screens/HomeScreen";
 import { DataContextProvider } from "./Context";
 import LineCharts from "./screens/LineChart";
+import Calibrate from "./screens/Calibrate";
 
 const Drawer = createDrawerNavigator();
 
@@ -15,6 +16,7 @@ const App = () => {
           <Drawer.Navigator>
             <Drawer.Screen name="Home" component={Home}/>
             <Drawer.Screen name="Chart" component={LineCharts} />
+            <Drawer.Screen name="Calibrate" component={Calibrate} />
           </Drawer.Navigator>
         </DataContextProvider>
       </NavigationContainer>

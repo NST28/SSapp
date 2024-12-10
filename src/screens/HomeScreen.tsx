@@ -10,6 +10,7 @@ import { DataContext } from '../Context';
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from '../constants/globalStyles';
 import CheckBox from '@react-native-community/checkbox';
+import { Float } from 'react-native/Libraries/Types/CodegenTypes';
 
 //Setup variables
 let dataArray = [0];
@@ -18,6 +19,7 @@ let lastTemp = 0;
 let queue = '';
 let count = 0;
 let average = 0;
+let pressure_data = 0.0;
 type VoidCallback = (result: boolean) => void;
 
 // Setup global array contain pressure sensor's data
@@ -132,7 +134,7 @@ const Home = () => {
   
   // *--------------------* BLE function setup *--------------------*
   const [allDevices, setAllDevices] = useState<Device[]>([]);
-  const [AnalogValve, setAnalogValve] = useState<number>(0);
+  const [AnalogValve, setAnalogValve] = useState<Float>(0);
 
   //Is a device connected?
   const [isConnected, setIsConnected] = useState(false);
@@ -270,12 +272,14 @@ const Home = () => {
                   let converted = (popped[1].charCodeAt(0) - 48)*64 + popped[0].charCodeAt(0) - 48;
                   count += 1;
                   average += converted;
-                  console.log(`Data received: ${popped}, converted value: ${converted}`);
+                  // console.log(`Data received: ${popped}, converted value: ${converted}`);
         
                   if(count % 15 === 0){
                     average = Math.ceil(average/15);
+                    pressure_data = (average*4.5/4096 - 0.5126)*(1/0.2326);
+                    pressure_data = Math.floor(pressure_data*1000)/1000;
                     setAnalogValve(average);
-                    console.log('connecting to Device:', average);
+                    console.log('connecting to Device:', pressure_data);
                     average = 0;
                   }
                   // console.log(`Data: ${popped}, Converted: ${converted}`);
@@ -380,19 +384,12 @@ const Home = () => {
           onValueChange={newValue => {
             setBoxValue(newValue);
             sendBoxValue(newValue);
+            
           }}
         />
       </View>
         
-      {/* Connect or disconnect device */}
-      <TouchableOpacity
-        onPress={isConnected ? disconnectDevice : openModal}
-        style={globalStyles.ctaButton}>
-        <Text style={globalStyles.ctaButtonText}>
-          {isConnected ? 'Disconnect' : 'Connect BLE Device'}
-        </Text>
-      </TouchableOpacity>
-
+      {/* Go to Datachart screen */}  
       <TouchableOpacity
         onPress={() => 
             navigation.navigate("Chart")
@@ -401,7 +398,27 @@ const Home = () => {
         <Text style={globalStyles.ctaButtonText}>
         {"Data Chart"}
         </Text>
-    </TouchableOpacity>
+      </TouchableOpacity>
+      
+      {/* Go to Calibrate screen */}  
+      <TouchableOpacity
+        onPress={() => 
+            navigation.navigate("Calibrate")
+        }
+        style={globalStyles.ctaButton}>
+        <Text style={globalStyles.ctaButtonText}>
+        {"Calibrate"}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Connect or disconnect device */}
+      <TouchableOpacity
+        onPress={isConnected ? disconnectDevice : openModal}
+        style={globalStyles.ctaButton}>
+        <Text style={globalStyles.ctaButtonText}>
+          {isConnected ? 'Disconnect' : 'Connect BLE Device'}
+        </Text>
+      </TouchableOpacity>
 
       <DeviceModal
         closeModal={hideModal}
