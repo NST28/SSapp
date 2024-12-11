@@ -134,7 +134,7 @@ const Home = () => {
   
   // *--------------------* BLE function setup *--------------------*
   const [allDevices, setAllDevices] = useState<Device[]>([]);
-  const [AnalogValve, setAnalogValve] = useState<Float>(0);
+  const [AnalogValve, setAnalogValve] = useState<Float>(0.0);
 
   //Is a device connected?
   const [isConnected, setIsConnected] = useState(false);
@@ -278,8 +278,8 @@ const Home = () => {
                     average = Math.ceil(average/15);
                     pressure_data = (average*4.5/4096 - 0.5126)*(1/0.2326);
                     pressure_data = Math.floor(pressure_data*1000)/1000;
-                    setAnalogValve(average);
-                    console.log('connecting to Device:', pressure_data);
+                    setAnalogValve(pressure_data);
+                    // console.log('connecting to Device:', pressure_data);
                     average = 0;
                   }
                   // console.log(`Data: ${popped}, Converted: ${converted}`);

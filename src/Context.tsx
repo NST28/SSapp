@@ -1,6 +1,7 @@
 // This pieces of code generate a global array which store data value from pressure sensor, hence act as database for visualising on graph.
 
 import React, { createContext, useState } from "react";
+import { Float } from "react-native/Libraries/Types/CodegenTypes";
 
 export const DataContext = createContext();
 
