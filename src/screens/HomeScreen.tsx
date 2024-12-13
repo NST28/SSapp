@@ -276,10 +276,12 @@ const Home = () => {
         
                   if(count % 15 === 0){
                     average = Math.ceil(average/15);
-                    pressure_data = (average*4.5/4096 - 0.5126)*(1/0.2326);
+                    pressure_data = (average*3.3/4096 - 0.5126)*(1/0.2326);
                     pressure_data = Math.floor(pressure_data*1000)/1000;
                     setAnalogValve(pressure_data);
-                    // console.log('connecting to Device:', pressure_data);
+                    // console.log('connecting to Device 4096:', converted);
+                    // console.log('average:', average);
+                    // console.log('pressure:', pressure_data);
                     average = 0;
                   }
                   // console.log(`Data: ${popped}, Converted: ${converted}`);

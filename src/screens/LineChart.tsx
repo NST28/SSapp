@@ -6,6 +6,8 @@ import { DataContext } from "../Context";
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from "../constants/globalStyles";
 
+var max_y_value = 12;
+
 const LineCharts = () => {
     const [testDataSelf, setTestDataSelf] = useState([
         {
@@ -27,7 +29,7 @@ const LineCharts = () => {
             setTestDataSelf(prevData => {
                 const newMonth = getNewMonthName();
                 const newValue = liveDataObj[Object.keys(liveDataObj).length - 1];
-                const newValueMap = newValue * 200 / 4096;
+                const newValueMap = newValue * 200 / max_y_value;
                 const newData = [...prevData, { month: newMonth, value: newValueMap}];
 
                 if (newData.length > data_strim) {

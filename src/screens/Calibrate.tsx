@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import {SafeAreaView, View, Text, TouchableOpacity } from "react-native";
-import { testData } from "../data";
 import { DataContext } from "../Context";
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from "../constants/globalStyles";
