@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from '../constants/globalStyles';
 import CheckBox from '@react-native-community/checkbox';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
+import { inverse, Matrix } from 'ml-matrix';
 
 //Setup variables
 let dataArray = [0];
@@ -21,6 +22,18 @@ let count = 0;
 let average = 0;
 let pressure_data = 0.0;
 type VoidCallback = (result: boolean) => void;
+
+let a0 = 0;
+let a1 = 0;
+let a2 = 0;
+let a3 = 0;
+
+let p0_rep = 0;
+let p30_rep = 0;
+let p60_rep = 0;
+let p90_rep = 0;
+
+const data_strim = 75;
 
 // Setup global array contain pressure sensor's data
 function appendData(array, newData) {
@@ -119,8 +132,121 @@ const DeviceModal: FC<DeviceModalProps> = props => {
   );
 };
 
+function Interpolate(p0: Float, p30: Float, p60: Float, p90: Float) {
+    var A = new Matrix([
+        [1, p0, p0^2, p0^3],
+        [1, p30, p30^2, p30^3],
+        [1, p60, p60^2, p60^3],
+        [1, p90, p90^2, p90^3],
+    ]);
+    var Ainv = inverse(A);
+    var C = new Matrix([
+        [0],
+        [30],
+        [60],
+        [90],
+    ]);
+    var B = Ainv.mmul(C);
+    a0 = B.get(0, 0);
+    a1 = B.get(1, 0);
+    a2 = B.get(2, 0);
+    a3 = B.get(3, 0);
+
+    p0_rep = p0;
+    p30_rep = p30;
+    p60_rep = p60;
+    p90_rep = p90;
+
+};
+
+const CalibModal: FC<CalibModalProps> = props => {
+  const {p0, p30, p60, p90, setP0, setP30, setP60, setP90, AnalogValve, visible, closeModal } = props;
+
+  return (
+    <Modal
+      style={globalStyles.container}
+      animationType="slide"
+      transparent={false}
+      visible={visible}>
+      <SafeAreaView style={globalStyles.container}>
+        <Text style={globalStyles.modalTitleText}>
+          Calibration
+        </Text>
+
+        <View style={globalStyles.heartRateTitleWrapper}>
+            <Text style={globalStyles.heartRateTitleText}>Current Data:</Text>
+            <Text style={globalStyles.heartRateText}>{AnalogValve}</Text>
+        </View>
+
+        {/* Calibrate button */}
+        <View style={globalStyles.ButtonLayout}>
+          <TouchableOpacity
+              onPress={() => 
+                  setP0(AnalogValve)
+              }
+              style={globalStyles.calibButton}>
+              <Text style={globalStyles.ctaButtonText}>
+              {"0º"}
+              </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+              onPress={() => 
+                  setP30(AnalogValve)
+              }
+              style={globalStyles.calibButton}>
+              <Text style={globalStyles.ctaButtonText}>
+              {"30º"}
+              </Text>
+          </TouchableOpacity>
+        </View>                   
+
+        <View style={globalStyles.ButtonLayout}>
+          <TouchableOpacity
+              onPress={() => 
+                  setP60(AnalogValve)
+              }
+              style={globalStyles.calibButton}>
+              <Text style={globalStyles.ctaButtonText}>
+              {"60º"}
+              </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+              onPress={() => 
+                  setP90(AnalogValve)
+              }
+              style={globalStyles.calibButton}>
+              <Text style={globalStyles.ctaButtonText}>
+              {"90º"}
+              </Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+            onPress={() => 
+                Interpolate(p0, p30, p60, p90)
+            }
+            style={globalStyles.ctaButton}>
+            <Text style={globalStyles.ctaButtonText}>
+            {"Calibrate"}
+            </Text>
+        </TouchableOpacity>              
+
+        <TouchableOpacity
+          onPress={closeModal}
+          style={globalStyles.ctaButton}>
+          <Text style={globalStyles.ctaButtonText}>
+            {"Home Screen"}
+          </Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </Modal>
+  );
+}
+
 const Home = () => {
-  // *--------------------* BLE devices list modal setup *--------------------*
+  // *-----------------------* BLE devices list modal setup *------------------*
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const hideModal = () => {
@@ -132,7 +258,7 @@ const Home = () => {
     setIsModalVisible(true);
   };
   
-  // *--------------------* BLE function setup *--------------------*
+  // *-----------------------* BLE function setup *----------------------------*
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [AnalogValve, setAnalogValve] = useState<Float>(0.0);
 
@@ -354,12 +480,34 @@ const Home = () => {
   var Array = appendData(dataArray, AnalogValve);
   useEffect(() => {
     const interval = setInterval(() => {
-      setLiveData(Array);
+      if (Array.length >= data_strim){
+        Array.splice(0, Array.length - data_strim);
+        setLiveData(Array);
+      } else{
+        setLiveData(Array);
+      }
     }, 1);
 
     // Clean up interval
     return () => clearInterval(interval);
   }, []);
+
+  //--------------------------------- Calibration modal -------------------------------------------
+  const [isCalibModalVisible, setIsCalibModalVisible] = useState<boolean>(false);
+  const [p0, setP0] = useState<Float>(0);
+  const [p30, setP30] = useState<Float>(0);
+  const [p60, setP60] = useState<Float>(0);
+  const [p90, setP90] = useState<Float>(0);
+
+  const hideCalibModal = () => {
+    setIsCalibModalVisible(false);
+  };
+
+  const openCalibModal = async () => {
+    // scanForDevices();
+    setIsCalibModalVisible(true);
+  };
+  // -------------------------------- End of Calibration modal ------------------------------------
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -390,6 +538,15 @@ const Home = () => {
           }}
         />
       </View>
+
+      {/* Go to Calibrate screen */}  
+      <TouchableOpacity
+        onPress={openCalibModal}
+        style={globalStyles.ctaButton}>
+        <Text style={globalStyles.ctaButtonText}>
+        {"Calibrate"}
+        </Text>
+      </TouchableOpacity>
         
       {/* Go to Datachart screen */}  
       <TouchableOpacity
@@ -400,18 +557,7 @@ const Home = () => {
         <Text style={globalStyles.ctaButtonText}>
         {"Data Chart"}
         </Text>
-      </TouchableOpacity>
-      
-      {/* Go to Calibrate screen */}  
-      <TouchableOpacity
-        onPress={() => 
-            navigation.navigate("Calibrate")
-        }
-        style={globalStyles.ctaButton}>
-        <Text style={globalStyles.ctaButtonText}>
-        {"Calibrate"}
-        </Text>
-      </TouchableOpacity>
+      </TouchableOpacity>  
 
       {/* Connect or disconnect device */}
       <TouchableOpacity
@@ -427,6 +573,20 @@ const Home = () => {
         visible={isModalVisible}
         connectToPeripheral={connectDevice}
         devices={allDevices}
+      />
+
+      <CalibModal
+        p0={p0}
+        p30={p30}
+        p60={p60}
+        p90={p90}
+        setP0={setP0}
+        setP30={setP30}
+        setP60={setP60}
+        setP90={setP90}
+        AnalogValve={AnalogValve}
+        closeModal={hideCalibModal}
+        visible={isCalibModalVisible}
       />
     </SafeAreaView>
   );

@@ -301,7 +301,7 @@ const LineChart = ({
                     fontWeight={fontWeight}
                     fontSize={fontSize}
                     fill={fill}
-                    >{2}
+                    >{3}
                 </SvgText>
 
                 <Line
@@ -319,7 +319,7 @@ const LineChart = ({
                     fontWeight={fontWeight}
                     fontSize={fontSize}
                     fill={fill}
-                    >{4}
+                    >{6}
                 </SvgText>
 
                 <Line
@@ -337,7 +337,7 @@ const LineChart = ({
                     fontWeight={fontWeight}
                     fontSize={fontSize}
                     fill={fill}
-                    >{6}
+                    >{9}
                 </SvgText>
 
                 <Line
@@ -355,7 +355,7 @@ const LineChart = ({
                     fontWeight={fontWeight}
                     fontSize={fontSize}
                     fill={fill}
-                    >{8}
+                    >{12}
                 </SvgText>
 
                 <SvgText
@@ -569,7 +569,7 @@ const LineChart = ({
                 fill={common_fill}
                 fontWeight={common_fontWeight}
                 textAnchor={common_textAnchor}
-                >{(data[Object.keys(data).length - 1][y_key]*8/200).toFixed(2)}
+                >{(data[Object.keys(data).length - 1][y_key]*12/200).toFixed(2)}
             </SvgText>
 
             </Svg>

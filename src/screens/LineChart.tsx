@@ -6,7 +6,8 @@ import { DataContext } from "../Context";
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from "../constants/globalStyles";
 
-var max_y_value = 12;
+const max_y_value = 12;
+const data_strim = 50;
 
 const LineCharts = () => {
     const [testDataSelf, setTestDataSelf] = useState([
@@ -21,8 +22,6 @@ const LineCharts = () => {
     // Get live data from BLE 
     const liveData = useContext(DataContext);
     var liveDataObj = liveData.liveData; 
-
-    const data_strim = 100;
   
     useEffect(() => {
         const interval = setInterval(() => {
