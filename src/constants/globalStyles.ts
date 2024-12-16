@@ -23,6 +23,7 @@ export const globalStyles = StyleSheet.create({
         fontSize: 25,
         marginTop: 15,
         color: 'black',
+        textAlign: 'center',
     },
 
     //chart
