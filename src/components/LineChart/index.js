@@ -301,7 +301,7 @@ const LineChart = ({
                     fontWeight={fontWeight}
                     fontSize={fontSize}
                     fill={fill}
-                    >{40}
+                    >{3}
                 </SvgText>
 
                 <Line
@@ -319,7 +319,7 @@ const LineChart = ({
                     fontWeight={fontWeight}
                     fontSize={fontSize}
                     fill={fill}
-                    >{80}
+                    >{6}
                 </SvgText>
 
                 <Line
@@ -337,7 +337,7 @@ const LineChart = ({
                     fontWeight={fontWeight}
                     fontSize={fontSize}
                     fill={fill}
-                    >{120}
+                    >{9}
                 </SvgText>
 
                 <Line
@@ -355,7 +355,7 @@ const LineChart = ({
                     fontWeight={fontWeight}
                     fontSize={fontSize}
                     fill={fill}
-                    >{160}
+                    >{12}
                 </SvgText>
 
                 <SvgText
@@ -366,7 +366,7 @@ const LineChart = ({
                     fontWeight={fontWeight}
                     textAnchor={"middle"}
                     transform="translate(27,150) rotate(270)"
-                    >{'Angle value (Degree)'}
+                    >{'Sample Value (Bar)'}
                 </SvgText>
             </G>
         )
@@ -569,7 +569,7 @@ const LineChart = ({
                 fill={common_fill}
                 fontWeight={common_fontWeight}
                 textAnchor={common_textAnchor}
-                >{(data[Object.keys(data).length - 1][y_key]*160/200).toFixed(2)}
+                >{(data[Object.keys(data).length - 1][y_key]*12/200).toFixed(2)}
             </SvgText>
 
             </Svg>

@@ -35,8 +35,6 @@ let p90_rep = 0;
 
 const data_strim = 75;
 
-let converted_angle_value = 0;
-
 // Setup global array contain pressure sensor's data
 function appendData(array, newData) {
   const lastValue = array[array.length - 1];
@@ -134,13 +132,12 @@ const DeviceModal: FC<DeviceModalProps> = props => {
   );
 };
 
-// ---------------------------------------------- Calib function ----------------------------------
-function Interpolate(p0: Float, p30: Float, p60: Float, p90: Float, setIsCalibComplete: React.Dispatch<React.SetStateAction<S>>) {
+function Interpolate(p0: Float, p30: Float, p60: Float, p90: Float) {
     var A = new Matrix([
-        [1, p0, p0*p0, p0*p0*p0],
-        [1, p30, p30*p30, p30*p30*p30],
-        [1, p60, p60*p60, p60*p60*p60],
-        [1, p90, p90*p90, p90*p90*p90],
+        [1, p0, p0^2, p0^3],
+        [1, p30, p30^2, p30^3],
+        [1, p60, p60^2, p60^3],
+        [1, p90, p90^2, p90^3],
     ]);
     var Ainv = inverse(A);
     var C = new Matrix([
@@ -160,11 +157,10 @@ function Interpolate(p0: Float, p30: Float, p60: Float, p90: Float, setIsCalibCo
     p60_rep = p60;
     p90_rep = p90;
 
-    setIsCalibComplete(true);
 };
 
 const CalibModal: FC<CalibModalProps> = props => {
-  const {p0, p30, p60, p90, setP0, setP30, setP60, setP90, setIsCalibComplete, AnalogValve, visible, closeModal } = props;
+  const {p0, p30, p60, p90, setP0, setP30, setP60, setP90, AnalogValve, visible, closeModal } = props;
 
   return (
     <Modal
@@ -229,7 +225,7 @@ const CalibModal: FC<CalibModalProps> = props => {
 
         <TouchableOpacity
             onPress={() => 
-                Interpolate(p0, p30, p60, p90, setIsCalibComplete)
+                Interpolate(p0, p30, p60, p90)
             }
             style={globalStyles.ctaButton}>
             <Text style={globalStyles.ctaButtonText}>
@@ -248,7 +244,6 @@ const CalibModal: FC<CalibModalProps> = props => {
     </Modal>
   );
 }
-// ---------------------------------------------- End of Calib function ---------------------------
 
 const Home = () => {
   // *-----------------------* BLE devices list modal setup *------------------*
@@ -262,9 +257,6 @@ const Home = () => {
     scanForDevices();
     setIsModalVisible(true);
   };
-
-  // *-----------------------* Angle value *----------------------------*
-  const [AngleValue, setAngleValue] = useState<Float>(0.0);
   
   // *-----------------------* BLE function setup *----------------------------*
   const [allDevices, setAllDevices] = useState<Device[]>([]);
@@ -413,10 +405,6 @@ const Home = () => {
                     pressure_data = (average*3.3/4096 - 0.5126)*(1/0.2326);
                     pressure_data = Math.floor(pressure_data*1000)/1000;
                     setAnalogValve(pressure_data);
-
-                    converted_angle_value = a0 + a1*pressure_data + a2*pressure_data*pressure_data + a3*pressure_data*pressure_data*pressure_data;
-                    converted_angle_value = Math.floor(converted_angle_value*100)/100;
-                    setAngleValue(converted_angle_value);
                     // console.log('connecting to Device 4096:', converted);
                     // console.log('average:', average);
                     // console.log('pressure:', pressure_data);
@@ -489,7 +477,7 @@ const Home = () => {
 
   // Push fresh data to global array
   const {setLiveData} = useContext(DataContext);
-  var Array = appendData(dataArray, AngleValue);
+  var Array = appendData(dataArray, AnalogValve);
   useEffect(() => {
     const interval = setInterval(() => {
       if (Array.length >= data_strim){
@@ -504,25 +492,12 @@ const Home = () => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-    console.log(`p0: ${p0_rep}, p30: ${p30_rep}, p60: ${p60_rep}, p90: ${p90_rep}`);
-    console.log(`a0: ${a0}, a1: ${a1}, a2: ${a2}, a3: ${a3},`);
-    console.log("======================================================");
-    }, 1000);
-
-    // Clean up interval
-    return () => clearInterval(interval);
-  }, []);
-
   //--------------------------------- Calibration modal -------------------------------------------
   const [isCalibModalVisible, setIsCalibModalVisible] = useState<boolean>(false);
   const [p0, setP0] = useState<Float>(0);
   const [p30, setP30] = useState<Float>(0);
   const [p60, setP60] = useState<Float>(0);
   const [p90, setP90] = useState<Float>(0);
-
-  const [isCalibComplete, setIsCalibComplete] = useState<boolean>(false);
 
   const hideCalibModal = () => {
     setIsCalibModalVisible(false);
@@ -540,26 +515,12 @@ const Home = () => {
         {isConnected ? (
           <>
             {/* <DataIndicator /> */}
-            <Text style={globalStyles.heartRateTitleText}>Current Pressure Data:</Text>
+            <Text style={globalStyles.heartRateTitleText}>Current Data:</Text>
             <Text style={globalStyles.heartRateText}>{AnalogValve}</Text>
           </>
         ) : (
           <Text style={globalStyles.heartRateTitleText}>
             Please Connect to a Bluetooth device
-          </Text>
-        )}
-      </View> 
-
-      <View style={globalStyles.heartRateTitleWrapper, {marginBottom: 150}}>
-        {isCalibComplete ? (
-          <>
-            {/* <DataIndicator /> */}
-            <Text style={globalStyles.heartRateTitleText}>Converted Angle Value:</Text>
-            <Text style={globalStyles.heartRateText}>{AngleValue}º</Text>
-          </>
-        ) : (
-          <Text style={globalStyles.heartRateTitleText}>
-            Convert function not generated
           </Text>
         )}
       </View> 
@@ -623,7 +584,6 @@ const Home = () => {
         setP30={setP30}
         setP60={setP60}
         setP90={setP90}
-        setIsCalibComplete={setIsCalibComplete}
         AnalogValve={AnalogValve}
         closeModal={hideCalibModal}
         visible={isCalibModalVisible}

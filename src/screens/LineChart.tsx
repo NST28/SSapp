@@ -6,7 +6,7 @@ import { DataContext } from "../Context";
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles } from "../constants/globalStyles";
 
-const max_y_value = 160;
+const max_y_value = 12;
 const data_strim = 50;
 
 const LineCharts = () => {
@@ -49,7 +49,7 @@ const LineCharts = () => {
     return (
         <SafeAreaView style={globalStyles.container}>
             <View style={globalStyles.heartRateTitleWrapper}>
-                <Text style={globalStyles.heartRateText}>Knee Joint Angle Chart</Text>
+                <Text style={globalStyles.heartRateText}>Sample Chart</Text>
                 <LineChart 
                     data={Object.keys(testDataSelf).length > 1 ? testDataSelf : testData}
                     // data={testDataSelf}
