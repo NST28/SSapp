@@ -23,6 +23,18 @@ export const globalStyles = StyleSheet.create({
         fontSize: 25,
         marginTop: 15,
         color: 'black',
+        textAlign: 'center',
+    },
+    calibProcessText: {
+        fontSize: 16,
+        marginTop: 15,
+        color: 'black',
+        textAlign: 'left',
+        backgroundColor:'#f2f2f2',
+        borderRadius: 10,
+        marginHorizontal: 30,
+        borderWidth: 2,
+        
     },
 
     //chart
